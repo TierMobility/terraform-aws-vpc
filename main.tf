@@ -37,6 +37,12 @@ resource "aws_vpc" "this" {
     var.tags,
     var.vpc_tags,
   )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
@@ -289,6 +295,12 @@ resource "aws_subnet" "private" {
     var.tags,
     var.private_subnet_tags,
   )
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 ##################
