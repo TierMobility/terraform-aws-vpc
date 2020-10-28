@@ -1455,6 +1455,16 @@ data "aws_vpc_endpoint_service" "kinesis_firehose" {
   service = "kinesis-firehose"
 }
 
+data "aws_subnet_ids" "firehose_selected_subnets" {
+  count = var.create_vpc && var.enable_kinesis_firehose_endpoint && length(var.kinesis_firehose_endpoint_selected_subnet_cidrs) > 0 ? 1 : 0
+
+  vpc_id = local.vpc_id
+  filter {
+    name   = "cidr"
+    values = var.kinesis_firehose_endpoint_selected_subnet_cidrs
+  }
+}
+
 resource "aws_vpc_endpoint" "kinesis_firehose" {
   count = var.create_vpc && var.enable_kinesis_firehose_endpoint ? 1 : 0
 
@@ -1463,7 +1473,10 @@ resource "aws_vpc_endpoint" "kinesis_firehose" {
   vpc_endpoint_type = "Interface"
 
   security_group_ids  = var.kinesis_firehose_endpoint_security_group_ids
-  subnet_ids          = coalescelist(var.kinesis_firehose_endpoint_subnet_ids, aws_subnet.private.*.id)
+  subnet_ids          = coalescelist(
+                          var.kinesis_firehose_endpoint_subnet_ids,
+                          length(var.kinesis_firehose_endpoint_selected_subnet_cidrs) > 0 ? tolist(data.aws_subnet_ids.firehose_selected_subnets[0].ids) : aws_subnet.private.*.id
+                        )
   private_dns_enabled = var.kinesis_firehose_endpoint_private_dns_enabled
 }
 

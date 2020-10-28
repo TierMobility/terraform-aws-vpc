@@ -817,6 +817,12 @@ variable "kinesis_firehose_endpoint_subnet_ids" {
   default     = []
 }
 
+variable "kinesis_firehose_endpoint_selected_subnet_cidrs" {
+  description = "The CIDRs which can be used to select the subnet for the endpoint in each AZ."
+  type        = list(string)
+  default     = []
+}
+
 variable "kinesis_firehose_endpoint_private_dns_enabled" {
   description = "Whether or not to associate a private hosted zone with the specified VPC for Kinesis Firehose endpoint"
   type        = bool
